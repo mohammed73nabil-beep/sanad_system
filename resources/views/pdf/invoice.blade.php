@@ -397,33 +397,36 @@
     </table>
 
     <!-- 3. ITEMS TABLE (Fixed 100% Width) -->
+    <!-- NOTE: DomPDF does not reorder table columns for RTL automatically, so the -->
+    <!-- physical (HTML source) column order below is written in reverse: the first -->
+    <!-- logical column (#) is written LAST so it lands on the right visually. -->
     <table class="items-table">
         <thead>
             <tr>
-                <th style="width: 4%;">#</th>
-                <th style="width: 37%;">{{ $ar('المنتج / البيان') }}</th>
-                <th style="width: 10%;">{{ $ar('الكمية') }}</th>
-                <th style="width: 12%;">{{ $ar('سعر الوحدة') }}</th>
-                <th style="width: 10%;">{{ $ar('الخصم') }}</th>
-                <th style="width: 10%;">{{ $ar('الضريبة') }} ({{ $company->default_tax_rate }}%)</th>
                 <th style="width: 16%;">{{ $ar('الإجمالي شامل الضريبة') }}</th>
+                <th style="width: 10%;">{{ $ar('الضريبة') }} ({{ $company->default_tax_rate }}%)</th>
+                <th style="width: 10%;">{{ $ar('الخصم') }}</th>
+                <th style="width: 12%;">{{ $ar('سعر الوحدة') }}</th>
+                <th style="width: 10%;">{{ $ar('الكمية') }}</th>
+                <th style="width: 37%;">{{ $ar('المنتج / البيان') }}</th>
+                <th style="width: 4%;">#</th>
             </tr>
         </thead>
         <tbody>
             @foreach($invoice->items as $index => $item)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td><strong>{{ number_format($item->total, 2) }} {{ $ar('ر.س') }}</strong></td>
+                    <td>{{ number_format($item->tax_amount, 2) }} {{ $ar('ر.س') }}</td>
+                    <td>{{ $item->discount_amount > 0 ? number_format($item->discount_amount, 2) : '—' }}</td>
+                    <td>{{ number_format($item->unit_price, 2) }} {{ $ar('ر.س') }}</td>
+                    <td>{{ number_format($item->quantity, 2) }} {{ $item->product && $item->product->unit ? $ar($item->product->unit->name) : '' }}</td>
                     <td class="desc-cell">
                         <strong>{{ $ar($item->product_name) }}</strong>
                         @if($item->barcode)
                             <div style="font-size: 8px; color: #64748b;">{{ $item->barcode }}</div>
                         @endif
                     </td>
-                    <td>{{ number_format($item->quantity, 2) }} {{ $item->product && $item->product->unit ? $ar($item->product->unit->name) : '' }}</td>
-                    <td>{{ number_format($item->unit_price, 2) }} {{ $ar('ر.س') }}</td>
-                    <td>{{ $item->discount_amount > 0 ? number_format($item->discount_amount, 2) : '—' }}</td>
-                    <td>{{ number_format($item->tax_amount, 2) }} {{ $ar('ر.س') }}</td>
-                    <td><strong>{{ number_format($item->total, 2) }} {{ $ar('ر.س') }}</strong></td>
+                    <td>{{ $index + 1 }}</td>
                 </tr>
             @endforeach
         </tbody>
