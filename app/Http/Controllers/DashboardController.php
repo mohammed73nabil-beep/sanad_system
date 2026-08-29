@@ -15,8 +15,12 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(\Illuminate\Http\Request $request): Response|\Illuminate\Http\RedirectResponse
     {
+        if ($request->user() && $request->user()->isSuperAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         $today = Carbon::today();
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();

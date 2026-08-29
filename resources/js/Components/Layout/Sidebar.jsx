@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse }) {
-    const { url } = usePage();
+    const { url, props } = usePage();
 
     const isActive = (path) => {
         if (path === '/') return url === '/';
