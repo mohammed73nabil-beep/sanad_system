@@ -58,7 +58,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($movements as $m)
+            @foreach($transactions as $m)
                 <tr>
                     <td>{{ $m['date'] }}</td>
                     <td>{{ $m['reference'] }}</td>

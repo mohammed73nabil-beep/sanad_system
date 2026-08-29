@@ -27,21 +27,76 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Owner/Admin User
+        // 0. Create Super Admin User (مالك النظام)
+        $superAdmin = User::firstOrCreate(
+            ['email' => 'superadmin@sanad.sa'],
+            [
+                'name'      => 'مالك النظام (Super Admin)',
+                'password'  => Hash::make('password'),
+                'role'      => 'super_admin',
+                'is_active' => true,
+            ]
+        );
+
+        // 1. Create Default Plans (الباقات)
+        $basicPlan = \App\Models\Plan::firstOrCreate(['name' => 'الباقة الأساسية'], [
+            'description'   => 'مناسبة للمنشآت والمحلات الصغيرة لتجربة النظام وإصدار الفواتير',
+            'price'         => 49.00,
+            'duration_days' => 30,
+            'invoice_limit' => 100,
+            'is_active'     => true,
+        ]);
+
+        $advancedPlan = \App\Models\Plan::firstOrCreate(['name' => 'الباقة المتقدمة'], [
+            'description'   => 'للمنشآت المتوسطة ذات حركة المبيعات النشطة والتقارير المتقدمة',
+            'price'         => 79.00,
+            'duration_days' => 30,
+            'invoice_limit' => 300,
+            'is_active'     => true,
+        ]);
+
+        $enterprisePlan = \App\Models\Plan::firstOrCreate(['name' => 'باقة الشركات'], [
+            'description'   => 'حجم فواتير غير محدود ودعم فني على مدار الساعة',
+            'price'         => 149.00,
+            'duration_days' => 30,
+            'invoice_limit' => 1000,
+            'is_active'     => true,
+        ]);
+
+        // 2. Create Owner/Admin User (العميل)
         $user = User::firstOrCreate(
             ['email' => 'admin@sanad.sa'],
             [
-                'name'      => 'مدير النظام',
+                'name'      => 'مؤسسة سَنَد للتجارة',
+                'phone'     => '0555123456',
                 'password'  => Hash::make('password'),
                 'role'      => 'owner',
                 'is_active' => true,
             ]
         );
 
+        // إنشاء اشتراك نشط للعميل
+        if ($user->subscriptions()->count() === 0) {
+            \App\Models\Subscription::create([
+                'user_id'        => $user->id,
+                'plan_id'        => $basicPlan->id,
+                'start_date'     => now()->subDays(5)->toDateString(),
+                'end_date'       => now()->addDays(25)->toDateString(),
+                'status'         => 'active',
+                'invoice_limit'  => 100,
+                'invoices_used'  => 2,
+                'price'          => 49.00,
+                'payment_status' => 'paid',
+                'activated_at'   => now()->subDays(5),
+                'notes'          => 'اشتراك تجريبي نشط',
+            ]);
+        }
+
         auth()->login($user);
 
-        // 2. Company Settings
+        // 3. Company Settings
         CompanySetting::firstOrCreate([], [
+            'user_id'             => $user->id,
             'name'                => 'مؤسسة سَنَد للتجارة العامة',
             'commercial_register' => '1010894523',
             'tax_number'          => '310245897600003',
@@ -68,9 +123,9 @@ class DatabaseSeeder extends Seeder
         $unitMeter = Unit::firstOrCreate(['name' => 'متر', 'short_name' => 'م']);
 
         // 4. Categories
-        $catFood = Category::firstOrCreate(['name' => 'مواد غذائية', 'slug' => 'food', 'color' => '#16a34a']);
-        $catElec = Category::firstOrCreate(['name' => 'أدوات كهربائية', 'slug' => 'electrical', 'color' => '#0284c7']);
-        $catPack = Category::firstOrCreate(['name' => 'مواد تعبئة وتغليف', 'slug' => 'packaging', 'color' => '#d97706']);
+        $catFood = Category::firstOrCreate(['slug' => 'food'], ['name' => 'مواد غذائية', 'color' => '#16a34a']);
+        $catElec = Category::firstOrCreate(['slug' => 'electrical'], ['name' => 'أدوات كهربائية', 'color' => '#0284c7']);
+        $catPack = Category::firstOrCreate(['slug' => 'packaging'], ['name' => 'مواد تعبئة وتغليف', 'color' => '#d97706']);
 
         // 5. Products
         $p1 = Product::firstOrCreate(['sku' => 'PRD-1001'], [

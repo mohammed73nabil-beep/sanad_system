@@ -308,18 +308,69 @@ export default function Sidebar({ isOpen, onClose, isCollapsed, onToggleCollapse
                         )}
                     </div>
 
-                    {/* Section: Settings */}
-                    <div className="sidebar-section-title">الإعدادات</div>
+                    {/* Super Admin Quick Link */}
+                    {props.auth?.user?.is_super_admin && (
+                        <div className="pt-2">
+                            <Link
+                                href="/admin"
+                                className="sidebar-item bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/30 font-bold"
+                                onClick={() => onClose && onClose()}
+                                title="لوحة Super Admin"
+                            >
+                                <Building2 className="w-5 h-5 shrink-0 text-purple-300" />
+                                <span>لوحة Super Admin ←</span>
+                            </Link>
+                        </div>
+                    )}
 
-                    <Link
-                        href="/settings/company"
-                        className={`sidebar-item ${url.startsWith('/settings') ? 'active' : ''}`}
-                        onClick={() => onClose && onClose()}
-                        title="بيانات المنشأة والضريبة"
-                    >
-                        <Settings className="w-5 h-5 shrink-0 text-slate-400" />
-                        <span>بيانات المنشأة والضريبة</span>
-                    </Link>
+                    {/* Subscription Status Widget for Customer */}
+                    {props.auth?.subscription && (
+                        <div className="mt-4 p-3 rounded-xl bg-slate-800/80 border border-slate-700 text-xs space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="font-bold text-white text-[11px] truncate">
+                                    {props.auth.subscription.plan_name}
+                                </span>
+                                <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                                    props.auth.subscription.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' :
+                                    props.auth.subscription.status === 'trial' ? 'bg-amber-500/20 text-amber-300' :
+                                    'bg-rose-500/20 text-rose-300'
+                                }`}>
+                                    {props.auth.subscription.status_label}
+                                </span>
+                            </div>
+
+                            <div>
+                                <div className="flex justify-between text-[10px] text-slate-400 mb-1">
+                                    <span>الفواتير:</span>
+                                    <span className="font-mono font-bold text-slate-200">
+                                        {props.auth.subscription.invoices_used} / {props.auth.subscription.invoice_limit}
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                                    <div
+                                        className={`h-full rounded-full ${
+                                            (props.auth.subscription.invoices_used / props.auth.subscription.invoice_limit) >= 1 ? 'bg-rose-500' :
+                                            (props.auth.subscription.invoices_used / props.auth.subscription.invoice_limit) >= 0.8 ? 'bg-amber-500' : 'bg-emerald-500'
+                                        }`}
+                                        style={{ width: `${Math.min(100, (props.auth.subscription.invoices_used / props.auth.subscription.invoice_limit) * 100)}%` }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-700/60">
+                                <span>صلاحية الاشتراك:</span>
+                                <span className={`font-bold ${props.auth.subscription.is_expiring_soon ? 'text-amber-400' : 'text-slate-300'}`}>
+                                    {props.auth.subscription.days_remaining} يوم متبقٍ
+                                </span>
+                            </div>
+
+                            {props.auth.subscription.is_limit_reached && (
+                                <div className="text-[10px] text-rose-400 font-bold bg-rose-500/10 p-1.5 rounded-lg border border-rose-500/20">
+                                    وصلت لحد الفواتير الأقصى
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </nav>
 
                 {/* Footer collapse button & info */}

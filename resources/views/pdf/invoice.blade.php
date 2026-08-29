@@ -9,6 +9,21 @@
             margin: 10mm 12mm 10mm 12mm;
         }
 
+        /* Cairo font must be registered locally for DomPDF (remote font loading
+           is disabled by default). Download the two weights below from
+           https://fonts.google.com/specimen/Cairo and place them wherever you
+           keep app fonts (e.g. storage/fonts/), then adjust the src path if needed. */
+        @font-face {
+            font-family: 'Cairo';
+            font-weight: normal;
+            src: url('{{ storage_path('fonts/Cairo-Regular.ttf') }}') format('truetype');
+        }
+        @font-face {
+            font-family: 'Cairo';
+            font-weight: bold;
+            src: url('{{ storage_path('fonts/Cairo-Bold.ttf') }}') format('truetype');
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -18,10 +33,10 @@
         html, body {
             width: 100%;
             max-width: 100%;
-            font-family: 'dejavu sans', Arial, sans-serif;
-            font-size: 11px;
+            font-family: 'Cairo', 'dejavu sans', Arial, sans-serif;
+            font-size: 12px;
             color: #1e293b;
-            line-height: 1.4;
+            line-height: 1.6;
             background: #ffffff;
             direction: rtl;
         }
@@ -72,41 +87,42 @@
         }
 
         .company-name {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
             color: #1B4B6B;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .company-info {
-            font-size: 9.5px;
+            font-size: 10.5px;
             color: #475569;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .invoice-col {
             width: 30%;
-            text-align: left;
+            text-align: center;
         }
 
         .invoice-title {
-            font-size: 17px;
+            font-size: 19px;
             font-weight: bold;
             color: #C8922A;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
+            letter-spacing: 0.3px;
         }
 
         .invoice-number {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             color: #1B4B6B;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .meta-line {
-            font-size: 9.5px;
+            font-size: 10.5px;
             color: #475569;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .status-badge {
@@ -134,18 +150,18 @@
         }
 
         .box-title-cell {
-            font-size: 10px;
+            font-size: 10.5px;
             font-weight: bold;
             color: #1B4B6B;
             border-bottom: 1px solid #e2e8f0;
-            padding: 5px 8px;
+            padding: 6px 9px;
             text-align: right;
             background-color: #f1f5f9;
         }
 
         .customer-data-cell {
-            font-size: 9.5px;
-            padding: 4px 8px;
+            font-size: 10.5px;
+            padding: 5px 9px;
             text-align: right;
             vertical-align: top;
         }
@@ -162,16 +178,17 @@
         .items-table th {
             background-color: #1B4B6B;
             color: #ffffff;
-            font-size: 9.5px;
+            font-size: 10.5px;
             font-weight: bold;
-            padding: 6px 4px;
+            padding: 9px 5px;
             border: 1px solid #1B4B6B;
             text-align: center;
+            letter-spacing: 0.2px;
         }
 
         .items-table td {
-            font-size: 9px;
-            padding: 5px 4px;
+            font-size: 10px;
+            padding: 8px 5px;
             border: 1px solid #e2e8f0;
             text-align: center;
             vertical-align: middle;
@@ -216,8 +233,8 @@
         }
 
         .totals-table td {
-            padding: 4px 6px;
-            font-size: 9.5px;
+            padding: 6px 8px;
+            font-size: 10.5px;
             border: 1px solid #e2e8f0;
         }
 
@@ -227,20 +244,20 @@
             color: #374151;
             width: 55%;
             text-align: right;
-            padding-right: 6px;
+            padding-right: 8px;
         }
 
         .tot-value {
             text-align: left;
             font-weight: bold;
             color: #0f172a;
-            padding-left: 6px;
+            padding-left: 8px;
         }
 
         .grand-row td {
             background-color: #1B4B6B !important;
             color: #ffffff !important;
-            font-size: 10.5px !important;
+            font-size: 12px !important;
         }
 
         .paid-text { color: #065f46; }
@@ -322,7 +339,7 @@
     <!-- 1. HEADER -->
     <table class="header-table">
         <tr>
-            <!-- Logo -->
+            <!-- Logo (physically left) -->
             <td class="logo-col">
                 @if($company->logo_path && file_exists(storage_path('app/public/' . $company->logo_path)))
                     <img src="{{ storage_path('app/public/' . $company->logo_path) }}" class="logo-img" alt="Logo" />
@@ -331,30 +348,13 @@
                 @endif
             </td>
 
-            <!-- Company Info -->
-            <td class="company-col">
-                <div class="company-name">{{ $ar($company->name ?? 'مؤسسة سَنَد للتجارة') }}</div>
-                @if($company->commercial_register)
-                    <div class="company-info">{{ $ar('السجل التجاري:') }} {{ $company->commercial_register }}</div>
-                @endif
-                @if($company->tax_number)
-                    <div class="company-info">{{ $ar('الرقم الضريبي:') }} {{ $company->tax_number }}</div>
-                @endif
-                @if($company->address || $company->city)
-                    <div class="company-info">{{ $ar($company->city . ($company->address ? ' - ' . $company->address : '')) }}</div>
-                @endif
-                @if($company->phone)
-                    <div class="company-info">{{ $ar('هاتف:') }} {{ $company->phone }}</div>
-                @endif
-            </td>
-
-            <!-- Invoice Title & Meta -->
+            <!-- Invoice Title & Meta (physically center) -->
             <td class="invoice-col">
                 <div class="invoice-title">{{ $ar('فاتورة ضريبية') }}</div>
                 <div class="invoice-number">{{ $invoice->invoice_number }}</div>
-                <div class="meta-line">{{ $ar('تاريخ الإصدار:') }} {{ $invoice->issue_date->format('Y-m-d') }}</div>
+                <div class="meta-line"><span dir="ltr" style="unicode-bidi: embed;">{{ $invoice->issue_date->format('Y-m-d') }}</span> {{ $ar('تاريخ الإصدار:') }}</div>
                 @if($invoice->due_date)
-                    <div class="meta-line">{{ $ar('تاريخ الاستحقاق:') }} {{ $invoice->due_date->format('Y-m-d') }}</div>
+                    <div class="meta-line"><span dir="ltr" style="unicode-bidi: embed;">{{ $invoice->due_date->format('Y-m-d') }}</span> {{ $ar('تاريخ الاستحقاق:') }}</div>
                 @endif
                 <div>
                     @if($invoice->status === 'paid')
@@ -368,6 +368,23 @@
                     @endif
                 </div>
             </td>
+
+            <!-- Company Info (physically right) -->
+            <td class="company-col">
+                <div class="company-name">{{ $ar($company->name ?? 'مؤسسة سَنَد للتجارة') }}</div>
+                @if($company->commercial_register)
+                    <div class="company-info"><span dir="ltr" style="unicode-bidi: embed;">{{ $company->commercial_register }}</span> {{ $ar('السجل التجاري:') }}</div>
+                @endif
+                @if($company->tax_number)
+                    <div class="company-info"><span dir="ltr" style="unicode-bidi: embed;">{{ $company->tax_number }}</span> {{ $ar('الرقم الضريبي:') }}</div>
+                @endif
+                @if($company->address || $company->city)
+                    <div class="company-info">{{ $ar($company->city . ($company->address ? ' - ' . $company->address : '')) }}</div>
+                @endif
+                @if($company->phone)
+                    <div class="company-info"><span dir="ltr" style="unicode-bidi: embed;">{{ $company->phone }}</span> {{ $ar('هاتف:') }}</div>
+                @endif
+            </td>
         </tr>
     </table>
 
@@ -379,19 +396,19 @@
             </td>
         </tr>
         <tr>
-            <td class="customer-data-cell" style="width: 50%;">
-                <strong>{{ $ar('الاسم / المنشأة:') }}</strong> {{ $ar($invoice->customer->name) }}
+            <td class="customer-data-cell" style="width: 50%; text-align: right;">
+                {{ $ar($invoice->customer->name) }} <strong>{{ $ar('الاسم / المنشأة:') }}</strong>
             </td>
-            <td class="customer-data-cell" style="width: 50%;">
-                <strong>{{ $ar('الرقم الضريبي:') }}</strong> {{ $invoice->customer->tax_number ?: $ar('غير متوفر') }}
+            <td class="customer-data-cell" style="width: 50%; text-align: right;">
+                <span dir="ltr" style="unicode-bidi: embed;">{{ $invoice->customer->phone ?: '—' }}</span> <strong>{{ $ar('رقم الجوال:') }}</strong>
             </td>
         </tr>
         <tr>
-            <td class="customer-data-cell">
-                <strong>{{ $ar('رقم الجوال:') }}</strong> {{ $invoice->customer->phone ?: '—' }}
+            <td class="customer-data-cell" style="text-align: right;">
+                {{ $ar($invoice->customer->city . ($invoice->customer->address ? ' - ' . $invoice->customer->address : '')) }} <strong>{{ $ar('العنوان:') }}</strong>
             </td>
-            <td class="customer-data-cell">
-                <strong>{{ $ar('العنوان:') }}</strong> {{ $ar($invoice->customer->city . ($invoice->customer->address ? ' - ' . $invoice->customer->address : '')) }}
+            <td class="customer-data-cell" style="text-align: right;">
+                <span dir="ltr" style="unicode-bidi: embed;">{{ $invoice->customer->tax_number ?: $ar('غير متوفر') }}</span> <strong>{{ $ar('الرقم الضريبي:') }}</strong>
             </td>
         </tr>
     </table>
@@ -435,41 +452,7 @@
     <!-- 4. TOTALS, NOTES, AND CODES -->
     <table class="summary-table">
         <tr>
-            <!-- Notes & Codes (Left column in LTR flow) -->
-            <td class="notes-side">
-                @if($invoice->notes)
-                    <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 4px; padding: 5px 7px; margin-bottom: 5px;">
-                        <strong style="color: #92400e; font-size: 9px;">{{ $ar('ملاحظات الفاتورة:') }}</strong>
-                        <div style="font-size: 8.5px; color: #475569; margin-top: 1px;">{{ $ar($invoice->notes) }}</div>
-                    </div>
-                @endif
-
-                @if($company->invoice_notes)
-                    <div style="font-size: 8px; color: #64748b; margin-bottom: 6px;">
-                        {{ $ar($company->invoice_notes) }}
-                    </div>
-                @endif
-
-                <!-- Barcode & QR Table -->
-                <table class="codes-table">
-                    <tr>
-                        @if(!empty($barcodeBase64))
-                            <td style="width: 65%;">
-                                <img src="{{ $barcodeBase64 }}" class="barcode-img" alt="Barcode" />
-                                <div class="code-caption">{{ $invoice->invoice_number }}</div>
-                            </td>
-                        @endif
-                        @if(!empty($qrCodeBase64))
-                            <td style="width: 35%;">
-                                <img src="{{ $qrCodeBase64 }}" class="qr-img" alt="QR Code" />
-                                <div class="code-caption">{{ $ar('رمز التحقق الإلكتروني') }}</div>
-                            </td>
-                        @endif
-                    </tr>
-                </table>
-            </td>
-
-            <!-- Totals (Right column in LTR flow) -->
+            <!-- Totals (Left column in HTML → renders LEFT visually in DomPDF) -->
             <td class="totals-side">
                 <table class="totals-table">
                     <tr>
@@ -504,6 +487,40 @@
                     </tr>
                 </table>
             </td>
+
+            <!-- Barcode & QR (Right column in HTML → renders RIGHT visually in DomPDF) -->
+            <td class="notes-side" style="text-align: center; vertical-align: middle;">
+                @if($invoice->notes)
+                    <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 4px; padding: 5px 7px; margin-bottom: 5px; text-align: right;">
+                        <strong style="color: #92400e; font-size: 9px;">{{ $ar('ملاحظات الفاتورة:') }}</strong>
+                        <div style="font-size: 8.5px; color: #475569; margin-top: 1px;">{{ $ar($invoice->notes) }}</div>
+                    </div>
+                @endif
+
+                @if($company->invoice_notes)
+                    <div style="font-size: 8px; color: #64748b; margin-bottom: 6px; text-align: right;">
+                        {{ $ar($company->invoice_notes) }}
+                    </div>
+                @endif
+
+                <!-- Barcode & QR Table -->
+                <table class="codes-table">
+                    <tr>
+                        @if(!empty($qrCodeBase64))
+                            <td style="width: 35%; text-align: center;">
+                                <img src="{{ $qrCodeBase64 }}" class="qr-img" alt="QR Code" />
+                                <div class="code-caption">{{ $ar('رمز التحقق الإلكتروني') }}</div>
+                            </td>
+                        @endif
+                        @if(!empty($barcodeBase64))
+                            <td style="width: 65%; text-align: center;">
+                                <img src="{{ $barcodeBase64 }}" class="barcode-img" alt="Barcode" />
+                                <div class="code-caption">{{ $invoice->invoice_number }}</div>
+                            </td>
+                        @endif
+                    </tr>
+                </table>
+            </td>
         </tr>
     </table>
 
@@ -521,7 +538,7 @@
 
     <!-- 6. FOOTER -->
     <div class="footer-bar">
-        {{ $ar('تم إصدار هذه الفاتورة الضريبية عبر نظام سَنَد لإدارة الفواتير والمبيعات') }} &mdash; {{ date('Y') }}
+        {{ $ar('تم إصدار هذه الفاتورة الضريبية عبر نظام سَنَد لإدارة الفواتير والمبيعات') }} &mdash; <span dir="ltr" style="unicode-bidi: embed;">{{ date('Y') }}</span>
     </div>
 
 </body>

@@ -13,6 +13,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'avatar_path',
         'role',
@@ -34,6 +35,20 @@ class User extends Authenticatable
     }
 
     // -------------------------------------------------------------------
+    // Role Helpers
+    // -------------------------------------------------------------------
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isCustomer(): bool
+    {
+        return in_array($this->role, ['owner', 'admin', 'staff']);
+    }
+
+    // -------------------------------------------------------------------
     // العلاقات
     // -------------------------------------------------------------------
 
@@ -52,6 +67,64 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
+    public function companySetting()
+    {
+        return $this->hasOne(CompanySetting::class);
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class)->orderByDesc('created_at');
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)
+            ->whereIn('status', ['active', 'trial'])
+            ->where('end_date', '>=', now()->toDateString())
+            ->latest('created_at');
+    }
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
+    }
+
+    // -------------------------------------------------------------------
+    // Subscription Business Logic
+    // -------------------------------------------------------------------
+
+    /**
+     * جلب الاشتراك النشط الحالي (مع تحديث الحالة تلقائياً)
+     */
+    public function getCurrentSubscription(): ?Subscription
+    {
+        $sub = $this->subscriptions()
+            ->whereIn('status', ['active', 'trial', 'expired'])
+            ->latest('created_at')
+            ->first();
+
+        if ($sub) {
+            $sub->checkAndExpire();
+            $sub->refresh();
+        }
+
+        return $sub;
+    }
+
+    /**
+     * هل يستطيع المستخدم إنشاء فاتورة جديدة؟
+     */
+    public function canCreateInvoice(): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true; // Super Admin لا يخضع للقيود
+        }
+
+        $sub = $this->getCurrentSubscription();
+        return $sub && $sub->canCreateInvoice();
+    }
+
     // -------------------------------------------------------------------
     // Scopes
     // -------------------------------------------------------------------
@@ -59,5 +132,15 @@ class User extends Authenticatable
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeCustomers($query)
+    {
+        return $query->whereIn('role', ['owner', 'admin', 'staff']);
+    }
+
+    public function scopeSuperAdmins($query)
+    {
+        return $query->where('role', 'super_admin');
     }
 }

@@ -41,6 +41,13 @@ class InvoiceService
         }
 
         return DB::transaction(function () use ($data, $items, $initialPayment) {
+            $user = auth()->user();
+            if ($user && $user->isCustomer() && !$user->canCreateInvoice()) {
+                $sub = $user->getCurrentSubscription();
+                $limit = $sub ? $sub->invoice_limit : 0;
+                throw new Exception("لقد وصلت إلى الحد المسموح من الفواتير ({$limit} فاتورة) في باقتك الحالية أو أن اشتراكك غير نشط. يرجى تجديد الاشتراك أو الترقية.");
+            }
+
             $invoiceNumber = $this->numberGenerator->generateInvoiceNumber();
             $issueDate = $data['issue_date'] ?? now()->toDateString();
             $status = $data['status'] ?? Invoice::STATUS_ISSUED;
@@ -180,6 +187,10 @@ class InvoiceService
                 "تم إنشاء الفاتورة رقم {$invoice->invoice_number} للعميل {$invoice->customer->name} بمبلغ {$invoice->total_amount} ر.س",
                 $invoice
             );
+
+            if ($user && $user->isCustomer()) {
+                app(\App\Services\SubscriptionService::class)->incrementInvoicesUsed($user);
+            }
 
             return $invoice->fresh(['items', 'customer', 'payments', 'receiptVouchers']);
         });

@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
+
+        $middleware->alias([
+            'super_admin'         => \App\Http\Middleware\EnsureSuperAdmin::class,
+            'can_create_invoice'  => \App\Http\Middleware\EnsureCanCreateInvoice::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
