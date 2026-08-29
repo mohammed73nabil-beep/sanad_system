@@ -17,12 +17,23 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard({
-    stats,
-    recent_customers,
-    expiring_soon,
-    recent_payments,
-    recent_activities,
+    stats = {
+        total_customers: 0,
+        active_customers: 0,
+        total_subscriptions: 0,
+        active_subs: 0,
+        trial_subs: 0,
+        expired_subs: 0,
+        expiring_soon: 0,
+        monthly_revenue: 0,
+        monthly_invoices: 0,
+    },
+    recent_customers = [],
+    expiring_soon = [],
+    recent_payments = [],
+    recent_activities = [],
 }) {
+    const s = stats || {};
     return (
         <AdminLayout title="لوحة التحكم الرئيسية">
             {/* Header Banner */}
@@ -63,10 +74,10 @@ export default function Dashboard({
                         <Users className="w-5 h-5 text-blue-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-white">
-                        {stats.total_customers}
+                        {s.total_customers || 0}
                     </div>
                     <div className="text-xs text-emerald-400 mt-2 flex items-center gap-1 font-semibold">
-                        <span>{stats.active_customers} عميل نشط</span>
+                        <span>{s.active_customers || 0} عميل نشط</span>
                     </div>
                 </div>
 
@@ -77,10 +88,10 @@ export default function Dashboard({
                         <CheckCircle className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-emerald-400">
-                        {stats.active_subs}
+                        {s.active_subs || 0}
                     </div>
                     <div className="text-xs text-slate-400 mt-2 font-semibold">
-                        من أصل {stats.total_subscriptions} اشتراك كلي
+                        من أصل {s.total_subscriptions || 0} اشتراك كلي
                     </div>
                 </div>
 
@@ -91,7 +102,7 @@ export default function Dashboard({
                         <Clock className="w-5 h-5 text-amber-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-amber-400">
-                        {stats.trial_subs}
+                        {s.trial_subs || 0}
                     </div>
                     <div className="text-xs text-slate-400 mt-2 font-semibold">
                         عملاء تحت التجربة
@@ -105,10 +116,10 @@ export default function Dashboard({
                         <AlertTriangle className="w-5 h-5 text-rose-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-rose-400">
-                        {stats.expiring_soon}
+                        {s.expiring_soon || 0}
                     </div>
                     <div className="text-xs text-slate-400 mt-2 font-semibold">
-                        {stats.expired_subs} اشتراك منتهي حالياً
+                        {s.expired_subs || 0} اشتراك منتهي حالياً
                     </div>
                 </div>
 
@@ -119,7 +130,7 @@ export default function Dashboard({
                         <DollarSign className="w-5 h-5 text-teal-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-teal-300">
-                        {Number(stats.monthly_revenue).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        {Number(s.monthly_revenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         <span className="text-xs font-bold mr-1 text-slate-400">ر.س</span>
                     </div>
                     <div className="text-xs text-slate-400 mt-2 font-semibold">
@@ -134,7 +145,7 @@ export default function Dashboard({
                         <FileText className="w-5 h-5 text-indigo-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-indigo-300">
-                        {stats.monthly_invoices}
+                        {s.monthly_invoices || 0}
                     </div>
                     <div className="text-xs text-slate-400 mt-2 font-semibold">
                         عبر جميع المنشآت
@@ -148,7 +159,7 @@ export default function Dashboard({
                         <TrendingUp className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div className="text-2xl lg:text-3xl font-black text-white">
-                        {stats.total_customers > 0 ? Math.round((stats.active_customers / stats.total_customers) * 100) : 0}%
+                        {(s.total_customers || 0) > 0 ? Math.round(((s.active_customers || 0) / s.total_customers) * 100) : 0}%
                     </div>
                     <div className="text-xs text-slate-400 mt-2 font-semibold">
                         حسابات مفعلة تعمل الآن
@@ -317,7 +328,7 @@ export default function Dashboard({
                                         <tr key={p.id} className="hover:bg-slate-750/50">
                                             <td className="py-3 font-bold text-white">{p.user_name}</td>
                                             <td className="py-3 font-bold text-emerald-400 font-mono">
-                                                {p.amount.toFixed(2)} ر.س
+                                                {Number(p.amount || 0).toFixed(2)} ر.س
                                             </td>
                                             <td className="py-3 text-slate-300 font-mono">{p.date}</td>
                                             <td className="py-3 text-slate-300">{p.method}</td>
