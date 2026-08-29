@@ -408,7 +408,7 @@ export default function ProductsIndex({ products, categories, units, filters, de
                                 <label className="label">رصيد المخزون الافتتاحي</label>
                                 <input
                                     type="number"
-                                    step="0.01"
+                                    step="1"
                                     min="0"
                                     className="input"
                                     value={data.stock_quantity}

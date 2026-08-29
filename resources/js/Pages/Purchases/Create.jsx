@@ -79,7 +79,18 @@ export default function PurchasesCreate({ suppliers, products: initialProducts =
 
     const updateItem = (index, field, value) => {
         const updated = [...items];
-        updated[index][field] = value;
+        if (field === 'quantity') {
+            if (value === '') {
+                updated[index][field] = '';
+            } else {
+                // منع الفواصل وضمان أرقام صحيحة (1, 2, 3...)
+                const cleaned = String(value).replace(/[^0-9]/g, '');
+                const intVal = parseInt(cleaned, 10);
+                updated[index][field] = isNaN(intVal) ? 1 : Math.max(1, intVal);
+            }
+        } else {
+            updated[index][field] = value;
+        }
         setItems(updated);
     };
 
@@ -348,8 +359,8 @@ export default function PurchasesCreate({ suppliers, products: initialProducts =
                                                     <td>
                                                         <input
                                                             type="number"
-                                                            step="0.01"
-                                                            min="0.01"
+                                                            step="1"
+                                                            min="1"
                                                             className="input !py-1.5 text-center font-bold text-sm"
                                                             value={item.quantity}
                                                             onChange={(e) => updateItem(index, 'quantity', e.target.value)}

@@ -436,7 +436,7 @@
                     <td>{{ number_format($item->tax_amount, 2) }} {{ $ar('ر.س') }}</td>
                     <td>{{ $item->discount_amount > 0 ? number_format($item->discount_amount, 2) : '—' }}</td>
                     <td>{{ number_format($item->unit_price, 2) }} {{ $ar('ر.س') }}</td>
-                    <td>{{ number_format($item->quantity, 2) }} {{ $item->product && $item->product->unit ? $ar($item->product->unit->name) : '' }}</td>
+                    <td>{{ (int)$item->quantity == $item->quantity ? (int)$item->quantity : rtrim(rtrim(number_format($item->quantity, 2), '0'), '.') }} {{ $item->product && $item->product->unit ? $ar($item->product->unit->name) : '' }}</td>
                     <td class="desc-cell">
                         <strong>{{ $ar($item->product_name) }}</strong>
                         @if($item->barcode)

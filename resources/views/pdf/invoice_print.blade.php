@@ -201,7 +201,7 @@
                                 <span style="font-size: 11px; color: #64748b;">({{ $item->barcode }})</span>
                             @endif
                         </td>
-                        <td>{{ number_format($item->quantity, 2) }}</td>
+                        <td>{{ (int)$item->quantity == $item->quantity ? (int)$item->quantity : rtrim(rtrim(number_format($item->quantity, 2), '0'), '.') }}</td>
                         <td>{{ number_format($item->unit_price, 2) }} ر.س</td>
                         <td>{{ $item->discount_amount > 0 ? number_format($item->discount_amount, 2) . ' ر.س' : '—' }}</td>
                         <td><strong>{{ number_format($item->total, 2) }} ر.س</strong></td>
