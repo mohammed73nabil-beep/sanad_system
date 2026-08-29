@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\CompanySetting;
+use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\ReceiptVoucher;
 use Illuminate\Support\Facades\DB;
 
 class NumberGeneratorService
@@ -17,11 +20,15 @@ class NumberGeneratorService
             $settings = CompanySetting::getOrCreate();
             $prefix = $settings->invoice_prefix ?: 'INV';
             
-            // Increment counter safely
-            $settings->increment('invoice_counter');
-            $counter = $settings->fresh()->invoice_counter;
+            $counter = (int) $settings->invoice_counter;
+            do {
+                $counter++;
+                $number = sprintf('%s-%06d', $prefix, $counter);
+            } while (Invoice::withoutTenantScope()->where('invoice_number', $number)->exists());
+
+            $settings->update(['invoice_counter' => $counter]);
             
-            return sprintf('%s-%06d', $prefix, $counter);
+            return $number;
         });
     }
 
@@ -34,10 +41,15 @@ class NumberGeneratorService
             $settings = CompanySetting::getOrCreate();
             $prefix = $settings->purchase_prefix ?: 'PUR';
             
-            $settings->increment('purchase_counter');
-            $counter = $settings->fresh()->purchase_counter;
+            $counter = (int) $settings->purchase_counter;
+            do {
+                $counter++;
+                $number = sprintf('%s-%06d', $prefix, $counter);
+            } while (Purchase::withoutTenantScope()->where('purchase_number', $number)->exists());
+
+            $settings->update(['purchase_counter' => $counter]);
             
-            return sprintf('%s-%06d', $prefix, $counter);
+            return $number;
         });
     }
 
@@ -50,10 +62,15 @@ class NumberGeneratorService
             $settings = CompanySetting::getOrCreate();
             $prefix = $settings->receipt_prefix ?: 'RCV';
             
-            $settings->increment('receipt_counter');
-            $counter = $settings->fresh()->receipt_counter;
+            $counter = (int) $settings->receipt_counter;
+            do {
+                $counter++;
+                $number = sprintf('%s-%06d', $prefix, $counter);
+            } while (ReceiptVoucher::withoutTenantScope()->where('voucher_number', $number)->exists());
+
+            $settings->update(['receipt_counter' => $counter]);
             
-            return sprintf('%s-%06d', $prefix, $counter);
+            return $number;
         });
     }
 
@@ -62,10 +79,10 @@ class NumberGeneratorService
      */
     public function generateSku(): string
     {
-        $maxId = Product::max('id') ?? 0;
+        $maxId = Product::withoutTenantScope()->max('id') ?? 0;
         $next = $maxId + 1;
         $sku = sprintf('PRD-%04d', $next);
-        while (Product::where('sku', $sku)->exists()) {
+        while (Product::withoutTenantScope()->where('sku', $sku)->exists()) {
             $next++;
             $sku = sprintf('PRD-%04d', $next);
         }

@@ -250,6 +250,8 @@ export default function InvoicesCreate({ customers, products: initialProducts = 
         ).slice(0, 8)
         : [];
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!selectedCustomer) {
@@ -262,6 +264,8 @@ export default function InvoicesCreate({ customers, products: initialProducts = 
             alert('يرجى إدخال اسم وسعر منتج واحد على الأقل في الفاتورة.');
             return;
         }
+
+        setIsSubmitting(true);
 
         router.post('/invoices', {
             customer_id: selectedCustomer,
@@ -282,6 +286,15 @@ export default function InvoicesCreate({ customers, products: initialProducts = 
                 payment_method: paymentMethod,
                 create_receipt_voucher: createReceiptVoucher,
             } : null,
+        }, {
+            preserveScroll: true,
+            onStart: () => setIsSubmitting(true),
+            onFinish: () => setIsSubmitting(false),
+            onError: (errs) => {
+                setIsSubmitting(false);
+                const firstErr = Object.values(errs)[0];
+                if (firstErr) alert(firstErr);
+            },
         });
     };
 
@@ -320,11 +333,11 @@ export default function InvoicesCreate({ customers, products: initialProducts = 
                         </Link>
                         <button
                             type="submit"
-                            disabled={processing}
+                            disabled={isSubmitting || processing}
                             className="btn btn-primary btn-lg flex items-center gap-2 shadow-md"
                         >
                             <CheckCircle2 className="w-5 h-5" />
-                            <span>حفظ وإصدار الفاتورة</span>
+                            <span>{isSubmitting ? 'جارٍ حفظ وإصدار الفاتورة...' : 'حفظ وإصدار الفاتورة'}</span>
                         </button>
                     </div>
                 </div>
