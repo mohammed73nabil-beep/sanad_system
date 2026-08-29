@@ -14,6 +14,8 @@ import {
     ArrowUpRight,
     Sparkles,
     Shield,
+    History,
+    Package,
 } from 'lucide-react';
 
 export default function Dashboard({
