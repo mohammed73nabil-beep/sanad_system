@@ -124,9 +124,11 @@ class Subscription extends Model
      */
     public function expiresWithinDays(int $days = 7): bool
     {
+        if (!$this->end_date) return false;
+        $endDate = $this->end_date instanceof Carbon ? $this->end_date : Carbon::parse($this->end_date);
         return in_array($this->status, [self::STATUS_ACTIVE, self::STATUS_TRIAL])
-            && Carbon::today()->diffInDays($this->end_date, false) <= $days
-            && Carbon::today()->lte($this->end_date);
+            && Carbon::today()->diffInDays($endDate, false) <= $days
+            && Carbon::today()->lte($endDate);
     }
 
     /**
@@ -134,7 +136,9 @@ class Subscription extends Model
      */
     public function daysRemaining(): int
     {
-        return max(0, (int) Carbon::today()->diffInDays($this->end_date, false));
+        if (!$this->end_date) return 0;
+        $endDate = $this->end_date instanceof Carbon ? $this->end_date : Carbon::parse($this->end_date);
+        return max(0, (int) Carbon::today()->diffInDays($endDate, false));
     }
 
     /**
@@ -142,9 +146,11 @@ class Subscription extends Model
      */
     public function checkAndExpire(): bool
     {
+        if (!$this->end_date) return false;
+        $endDate = $this->end_date instanceof Carbon ? $this->end_date : Carbon::parse($this->end_date);
         if (
             in_array($this->status, [self::STATUS_ACTIVE, self::STATUS_TRIAL])
-            && Carbon::today()->gt($this->end_date)
+            && Carbon::today()->gt($endDate)
         ) {
             $this->update(['status' => self::STATUS_EXPIRED]);
             return true;

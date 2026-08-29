@@ -33,14 +33,15 @@ class HandleInertiaRequests extends Middleware
 
         if ($user && $user->isCustomer()) {
             $sub = $user->getCurrentSubscription();
-            if ($sub) {
+            if ($sub && $sub->end_date) {
                 $realUsed = $sub->getRealInvoicesUsed();
+                $endDateStr = $sub->end_date instanceof \Carbon\Carbon ? $sub->end_date->format('Y-m-d') : (string) $sub->end_date;
                 $subscriptionData = [
                     'id'                 => $sub->id,
                     'plan_name'          => $sub->plan?->name ?? 'مخصص',
                     'status'             => $sub->status,
                     'status_label'       => $sub->status_label,
-                    'end_date'           => $sub->end_date->format('Y-m-d'),
+                    'end_date'           => $endDateStr,
                     'days_remaining'     => $sub->daysRemaining(),
                     'invoice_limit'      => $sub->invoice_limit,
                     'invoices_used'      => $realUsed,
