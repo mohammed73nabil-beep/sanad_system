@@ -36,7 +36,7 @@ class AdminDashboardController extends Controller
                 'role'   => $u->role,
                 'status' => $u->is_active ? 'نشط' : 'معطل',
                 'subscription_status' => $u->latestSubscription?->status_label ?? 'لا يوجد',
-                'created_at' => $u->created_at->format('Y-m-d'),
+                'created_at' => $u->created_at ? $u->created_at->format('Y-m-d') : '—',
             ]);
 
         // الاشتراكات التي ستنتهي قريباً
@@ -48,9 +48,9 @@ class AdminDashboardController extends Controller
             ->get()
             ->map(fn ($s) => [
                 'id'          => $s->id,
-                'user_name'   => $s->user->name,
+                'user_name'   => $s->user?->name ?? 'غير محدد',
                 'plan_name'   => $s->plan?->name ?? 'مخصص',
-                'end_date'    => $s->end_date->format('Y-m-d'),
+                'end_date'    => $s->end_date ? ($s->end_date instanceof \Carbon\Carbon ? $s->end_date->format('Y-m-d') : (string) $s->end_date) : '—',
                 'days_left'   => $s->daysRemaining(),
                 'status'      => $s->status_label,
             ]);
@@ -62,10 +62,10 @@ class AdminDashboardController extends Controller
             ->get()
             ->map(fn ($p) => [
                 'id'         => $p->id,
-                'user_name'  => $p->user->name,
+                'user_name'  => $p->user?->name ?? 'غير محدد',
                 'plan_name'  => $p->subscription?->plan?->name ?? 'مخصص',
                 'amount'     => (float) $p->amount,
-                'date'       => $p->payment_date->format('Y-m-d'),
+                'date'       => $p->payment_date ? ($p->payment_date instanceof \Carbon\Carbon ? $p->payment_date->format('Y-m-d') : (string) $p->payment_date) : '—',
                 'method'     => $p->method_label,
                 'status'     => $p->status_label,
             ]);
@@ -85,7 +85,7 @@ class AdminDashboardController extends Controller
                 'action'      => $log->action,
                 'description' => $log->description,
                 'user_name'   => $log->user?->name ?? 'النظام',
-                'created_at'  => $log->created_at->format('Y-m-d H:i'),
+                'created_at'  => $log->created_at ? $log->created_at->format('Y-m-d H:i') : '—',
             ]);
 
         return Inertia::render('Admin/Dashboard', [
