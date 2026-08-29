@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
-import { Lock, Mail, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Lock, Mail, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 
 export default function Login({ status }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -116,6 +116,16 @@ export default function Login({ status }) {
                             <span>{processing ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}</span>
                         </button>
                     </form>
+
+                    {/* Switch to Register */}
+                    <div className="text-center mt-6 pt-4 border-t border-slate-100">
+                        <p className="text-sm text-slate-600">
+                            ليس لديك حساب بعد؟{' '}
+                            <Link href="/register" className="font-bold text-sky-800 hover:text-sky-950 underline mr-1">
+                                إنشاء حساب جديد (فترة تجريبية) ←
+                            </Link>
+                        </p>
+                    </div>
                 </div>
 
                 {/* Footer */}
