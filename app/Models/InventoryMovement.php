@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class InventoryMovement extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'product_id', 'type', 'quantity', 'quantity_before', 'quantity_after',
+        'user_id', 'product_id', 'type', 'quantity', 'quantity_before', 'quantity_after',
         'unit_cost', 'reference_type', 'reference_id', 'notes', 'created_by',
     ];
 

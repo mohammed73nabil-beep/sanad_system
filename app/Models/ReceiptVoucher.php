@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReceiptVoucher extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToTenant;
 
     protected $fillable = [
-        'voucher_number', 'customer_id', 'invoice_id', 'payment_id',
+        'user_id', 'voucher_number', 'customer_id', 'invoice_id', 'payment_id',
         'amount', 'payment_method', 'voucher_date',
         'amount_in_words', 'reference', 'description', 'created_by',
     ];

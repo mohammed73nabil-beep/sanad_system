@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
+    use BelongsToTenant;
+
+    protected string $tenantKey = 'created_by';
     protected $fillable = [
         'invoice_id', 'customer_id', 'amount',
         'payment_method', 'payment_date', 'reference', 'notes', 'created_by',

@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToTenant;
 
     protected $fillable = [
-        'name', 'sku', 'barcode', 'category_id', 'unit_id',
+        'user_id', 'name', 'sku', 'barcode', 'category_id', 'unit_id',
         'purchase_price', 'sale_price', 'tax_rate',
         'stock_quantity', 'min_stock_level',
         'image_path', 'description', 'status',

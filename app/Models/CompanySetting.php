@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class CompanySetting extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
+        'user_id',
         'name', 'logo_path', 'commercial_register', 'tax_number',
         'phone', 'email', 'address', 'city', 'region',
         'postal_code', 'additional_number', 'currency', 'currency_symbol',
@@ -26,7 +30,7 @@ class CompanySetting extends Model
     }
 
     /**
-     * جلب إعدادات المنشأة (دائماً سجل واحد فقط)
+     * جلب إعدادات المنشأة (للمستخدم الحالي)
      */
     public static function current(): ?self
     {

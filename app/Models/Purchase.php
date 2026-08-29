@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Purchase extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToTenant;
 
     protected $fillable = [
-        'purchase_number', 'supplier_id', 'status',
+        'user_id', 'purchase_number', 'supplier_id', 'status',
         'purchase_date', 'due_date',
         'subtotal', 'discount_amount', 'tax_amount', 'total_amount',
         'paid_amount', 'remaining_amount',

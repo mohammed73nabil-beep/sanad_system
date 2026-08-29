@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class Unit extends Model
 {
-    protected $fillable = ['name', 'short_name', 'is_active'];
+    use BelongsToTenant;
+
+    protected $fillable = ['user_id', 'name', 'short_name', 'is_active'];
 
     protected function casts(): array
     {

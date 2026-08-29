@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Category extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToTenant;
 
-    protected $fillable = ['name', 'slug', 'description', 'color', 'is_active'];
+    protected $fillable = ['user_id', 'name', 'slug', 'description', 'color', 'is_active'];
 
     protected function casts(): array
     {

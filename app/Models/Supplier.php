@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToTenant;
 
     protected $fillable = [
-        'name', 'phone', 'email', 'tax_number', 'commercial_register',
+        'user_id', 'name', 'phone', 'email', 'tax_number', 'commercial_register',
         'address', 'city', 'notes',
         'total_purchases', 'total_paid', 'total_remaining', 'is_active',
     ];
